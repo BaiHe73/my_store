@@ -11,5 +11,8 @@ export default {
 </script>
 
 <style>
-
+/*设置根实例模板高度*/
+#app {
+  height: 100%;
+}
 </style>
