@@ -17,7 +17,7 @@
     </el-row>
     <!-- 表格 -->
     <el-table
-      :data="tableData"
+      :data="usersData"
       border
       stripe
       style="width: 100%">
@@ -26,53 +26,100 @@
         width="50">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="username"
         label="姓名"
-        width="180">
+        width="150">
       </el-table-column>
       <el-table-column
         prop="email"
         label="邮箱"
-        width="180">
+        width="200">
       </el-table-column>
       <el-table-column
         prop="mobile"
-        label="电话">
+        label="电话"
+        width="180">
       </el-table-column>
-      <!-- <el-table-column
-        prop="do"
+      <el-table-column
+        label="时间"
+        width="150">
+        <template slot-scope="scope">
+          <!-- scope.row 是当前行绑定的数据对象 -->
+          <!-- {{ scope.$index }} -->
+          {{ scope.row.create_time | fmtDate('YYYY - MM - DD')}}
+        </template>
+      </el-table-column>
+      <el-table-column
+        label="用户状态"
+        width="80">
+        <template slot-scope="scope">
+          <el-switch
+            v-model="scope.row.mg_state"
+            active-color="#13ce66"
+            inactive-color="#ff4949">
+          </el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column
         label="操作">
-        <el-button type="primary" icon="el-icon-edit"></el-button>
-        <el-button type="primary" icon="el-icon-share"></el-button>
-        <el-button type="primary" icon="el-icon-delete"></el-button>
-      </el-table-column> -->
+        <template slot-scope="scope">
+          <el-button
+            type="primary"
+            plain
+            size="mini"
+            icon="el-icon-edit">
+          </el-button>
+          <el-button
+            type="danger"
+            plain
+            size="mini"
+            icon="el-icon-delete">
+          </el-button>
+          <el-button
+            type="warning"
+            plain
+            size="mini"
+            icon="el-icon-check">
+          </el-button>
+        </template>
+      </el-table-column>
 
     </el-table>
   </el-card>
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
-      tableData: [
-        {
-          name: '2016-05-02',
-          email: '王小虎',
-          mobile: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          name: '2016-05-02',
-          email: '王小虎',
-          mobile: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          name: '2016-05-02',
-          email: '王小虎',
-          mobile: '上海市普陀区金沙江路 1518 弄'
-        }
-      ]
+      usersData: []
     };
+  },
+  created() {
+  // 获取用户列表方法
+    this.loadData();
+  },
+  methods: {
+    // 获取用户列表方法
+    async loadData() {
+      // 在发送请求时 要在请求头中添加Authorization=token 携带token
+      var token = sessionStorage.getItem('token');
+      axios.defaults.headers.common['Authorization'] = token;
+
+      var response = await axios.get('http://localhost:8888/api/private/v1/users?pagenum=1&pagesize=10');
+      // console.log(response);
+      // response 的样子
+      // { data: ,status: 200, headers: {}..... }
+      // response.data 的样子,服务器返回的数据
+      // { data: , meta: { msg:'', status: 200 }
+      var { data: { meta: { status, msg } } } = response;
+      if (status === 200) {
+        this.usersData = response.data.data.users;
+      } else {
+        this.$message.error(msg);
+      }
+    }
   }
 };
 </script>
