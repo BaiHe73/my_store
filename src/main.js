@@ -19,5 +19,5 @@ new Vue({
   el: '#app',
   router,
   components: { App },
-  tvemplate: '<App/>'
+  template: '<App/>'
 });

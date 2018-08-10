@@ -19,7 +19,6 @@
 <script>
 // 导入axios模块
 import axios from 'axios';
-
 export default {
   data() {
     return {
@@ -28,6 +27,9 @@ export default {
         password: ''
       }
     };
+  },
+  created() {
+    console.log('123');
   },
   methods: {
     handleLogin() {
