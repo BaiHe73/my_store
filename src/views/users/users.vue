@@ -83,8 +83,17 @@
           </el-button>
         </template>
       </el-table-column>
-
     </el-table>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[1, 2, 3, 4]"
+      :page-size="pagesize"
+      :page-count="7"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="count">
+    </el-pagination>
   </el-card>
 </template>
 
@@ -92,7 +101,14 @@
 export default {
   data() {
     return {
-      usersData: []
+      usersData: [],
+      // 分页相关数据
+      // 页码
+      pagenum: 1,
+      // 每页数据
+      pagesize: 2,
+      // 总数
+      count: 0
     };
   },
   created() {
@@ -106,7 +122,7 @@ export default {
       var token = sessionStorage.getItem('token');
       this.$http.defaults.headers.common['Authorization'] = token;
 
-      var response = await this.$http.get('users?pagenum=1&pagesize=10');
+      var response = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
       // console.log(response);
       // response 的样子
       // { data: ,status: 200, headers: {}..... }
@@ -114,10 +130,23 @@ export default {
       // { data: , meta: { msg:'', status: 200 }
       var { data: { meta: { status, msg } } } = response;
       if (status === 200) {
+        // 总共的数据数
+        this.count = response.data.data.total;
         this.usersData = response.data.data.users;
       } else {
         this.$message.error(msg);
       }
+    },
+    handleSizeChange(val) {
+      this.pagesize = val;
+      // 重新渲染页面
+      this.loadData();
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      this.pagenum = val;
+      this.loadData();
+      console.log(`当前页: ${val}`);
     }
   }
 };
