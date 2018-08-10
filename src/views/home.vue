@@ -16,7 +16,7 @@
         <el-menu
           default-active="/user"
           class="el-menu-vertical-demo"
-          unique-opened="true"
+          unique-opened
           router
           >
           <el-submenu index="1">
@@ -66,7 +66,17 @@
 
 <script>
 export default {
-
+  // 判断是否登录
+  // 在vue实例创建之前 检查是否具有token
+  beforeCreate() {
+    var token = sessionStorage.getItem('token');
+    // console.log(token);
+    if (!token) {
+      this.$message.warning('请先登录');
+      // 没有token，跳转到登录页面
+      this.$router.push('/login');
+    }
+  }
 };
 </script>
 

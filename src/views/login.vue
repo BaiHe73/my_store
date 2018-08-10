@@ -28,9 +28,6 @@ export default {
       }
     };
   },
-  created() {
-    console.log('123');
-  },
   methods: {
     handleLogin() {
       axios
@@ -53,6 +50,7 @@ export default {
             sessionStorage.setItem('token', token);
             // console.log(token);
             // 跳转
+            this.$router.push('/');
           } else {
             // 登录失败
             this.$message.error(message);
