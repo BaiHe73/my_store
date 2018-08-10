@@ -10,8 +10,14 @@
         <el-input v-model="formData.username"></el-input>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input type="password" v-model="formData.password"></el-input>
+        <!-- 添加回车登录功能 ？？？？-->
+        <!-- 对于组件，vue有自己的事件机制，用的是vue事件机制实现的keyup事件 -->
+        <!-- 想要转变为原生的事件机制需要加上native -->
+        <!-- 而原生的html标签是原生的事件机制 所以无需加native -->
+        <!-- 想使用DOM中的keyup事件 native是告诉组件，我要使用原生DOM事件 -->
+        <el-input @keyup.enter.native="handleLogin" type="password" v-model="formData.password"></el-input>
       </el-form-item>
+      <!-- 为什么click不加 -->
       <el-button @click="handleLogin" class="login-btn" type="primary">登录</el-button>
     </el-form>
   </div>
