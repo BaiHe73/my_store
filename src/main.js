@@ -3,7 +3,7 @@
 import Vue from 'vue';
 import App from './App';
 import router from './router';
-import axios from 'axios';
+import myaxios from '@/plugins/Myaxios.js';
 // 引入element模块
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
@@ -14,15 +14,14 @@ import moment from 'moment';
 
 // 注册插件
 Vue.use(ElementUI);
+// console.log(myaxios);
+// 注册myaxios插件
+Vue.use(myaxios);
 
 // 全局过滤器 格式化时间
 Vue.filter('fmtDate', (value, fmtStr) => {
   return moment(value).format(fmtStr);
 });
-
-// 配置全局axios
-axios.defaults.baseURL = 'http://localhost:8888/api/private/v1/';
-Vue.prototype.$http = axios;
 
 Vue.config.productionTip = false;
 
