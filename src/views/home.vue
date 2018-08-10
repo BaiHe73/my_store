@@ -4,7 +4,11 @@
       <el-row>
         <el-col :span="4"><div><img src="@/assets/logo.png"></div></el-col>
         <el-col :span="19"><div class="title">电商后台管理系统</div></el-col>
-        <el-col :span="1"><div class="logout"><a href="#">退出</a></div></el-col>
+        <el-col :span="1">
+          <div class="logout">
+            <a href="#" @click.prevent="handleLogout">退出</a>
+          </div>
+        </el-col>
       </el-row>
     </el-header>
     <el-container>
@@ -74,6 +78,17 @@ export default {
     if (!token) {
       this.$message.warning('请先登录');
       // 没有token，跳转到登录页面
+      this.$router.push('/login');
+    }
+  },
+  methods: {
+    // 退出处理函数
+    handleLogout() {
+      // 提示登录成功
+      this.$message.success('退出成功');
+      // 清除token
+      sessionStorage.clear('token');
+      // 跳转到登录页
       this.$router.push('/login');
     }
   }
