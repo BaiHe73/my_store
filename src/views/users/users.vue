@@ -75,12 +75,16 @@
       <el-table-column
         label="操作">
         <template slot-scope="scope">
+          <!-- 编辑按钮 -->
+          <!-- ?????????????????????????????????? -->
           <el-button
+            @click="openEditDialog(scope.row)"
             type="primary"
             plain
             size="mini"
             icon="el-icon-edit">
           </el-button>
+          <!-- 删除按钮 -->
           <el-button
             type="danger"
             plain
@@ -106,6 +110,7 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="count">
     </el-pagination>
+    <!-- 添加用户对话框 -->
     <el-dialog
       title="添加用户"
       :visible.sync="addUserDialogVisible">
@@ -132,8 +137,38 @@
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addUserDialogVisible = false">取 消</el-button>
-        <!-- <el-button type="primary" @click="addUserDialogVisible = false">确 定</el-button> -->
         <el-button type="primary" @click="handleAdd">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- 编辑用户对话框 -->
+    <el-dialog
+      @close="handleEditClose"
+      title="编辑用户"
+      :visible.sync="editUserDialogVisible">
+      <!-- .sync 加上后才可以关上对话框 -->
+      <!-- .sync同步 自动更新父组件属性的 v-on 监听器-->
+      <!-- ref 被用来给元素或子组件注册引用信息 ref="editForm"-->
+      <el-form
+        :rules="rules"
+        label-width="80px"
+        :model="form">
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="form.username" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input type="password" v-model="form.password" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱">
+          <el-input v-model="form.email" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="form.mobile" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editUserDialogVisible = false">取 消</el-button>
+        <!-- <el-button type="primary" @click="addUserDialogVisible = false">确 定</el-button> -->
+        <el-button type="primary" @click="handleEdit">确 定</el-button>
       </span>
     </el-dialog>
   </el-card>
@@ -155,6 +190,7 @@ export default {
       searchValue: '',
       // 默认添加用户对话框不显示
       addUserDialogVisible: false,
+      editUserDialogVisible: false,
       form: {
         username: '',
         password: '',
@@ -203,12 +239,12 @@ export default {
       this.pagesize = val;
       // 重新渲染页面
       this.loadData();
-      console.log(`每页 ${val} 条`);
+      // console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
       this.pagenum = val;
       this.loadData();
-      console.log(`当前页: ${val}`);
+      // console.log(`当前页: ${val}`);
     },
     handleSearch() {
       this.loadData();
@@ -241,6 +277,51 @@ export default {
           this.$message.error('表单验证失败');
         }
       });
+    },
+    // 处理修改对话框直接显示当前用户信息的方法
+    openEditDialog(user) {
+      // 这个user(随意命名)哪来的？？？？？？
+      // console.log(user);
+      // 显示对话框
+      this.editUserDialogVisible = true;
+      this.form.username = user.username;
+      this.form.email = user.email;
+      this.form.mobile = user.mobile;
+      // 存储用户的id
+      this.form.id = user.id;
+    },
+    handleEditClose() {
+      // 清空表单数据 对话框×之后添加用户框无内容
+      for (var key in this.form) {
+        this.form[key] = '';
+      }
+    },
+    async handleEdit() {
+      // 发送编辑用户请求
+      const response = await this.$http.put(`users/${this.form.id}`, {
+        email: this.form.email,
+        mobile: this.form.mobile
+      });
+      // console.log(response);
+      // 检测用户是否添加成功
+      var { data: { meta: { status, msg } } } = response;
+      if (status === 200) {
+        // 添加成功
+        // 显示提示消息
+        this.$message.success(msg);
+        // 关闭对话框
+        this.editUserDialogVisible = false;
+        // 重新加载数据
+        this.loadData();
+        // 清空表单 点击添加用户时 表单中无内容
+        for (var key in this.form) {
+          this.form[key] = '';
+        }
+        console.log(this.form);
+      } else {
+        // 提示失败信息
+        this.$message.error(msg);
+      }
     }
   }
 };
