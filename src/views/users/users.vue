@@ -94,6 +94,7 @@
             icon="el-icon-delete">
           </el-button>
           <el-button
+            @click="handleOpenRoleDialog(scope.row)"
             type="warning"
             plain
             size="mini"
@@ -102,6 +103,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页功能 -->
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -173,6 +175,30 @@
         <el-button type="primary" @click="handleEdit">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 分配角色对话框 -->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="setRoleDialogFormVisible">
+      <el-form>
+        <el-form-item label="当前用户" label-width="120px">
+          {{ currentName }}
+        </el-form-item>
+        <el-form-item label="请选择角色" label-width="120px">
+          <el-select v-model="currentRoleId">
+            <el-option
+              v-for="item in roles"
+              :key="item.id"
+              :label="item.roleName"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="handleRoleSet">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -190,9 +216,17 @@ export default {
       count: 0,
       // 绑定搜索文本框
       searchValue: '',
+      // 分配角色需要的数据
+      currentName: '',
+      // 绑定下拉框
+      currentRoleId: '',
+      currentUserId: '',
+      // 角色列表
+      roles: [],
       // 默认添加用户对话框不显示
       addUserDialogVisible: false,
       editUserDialogVisible: false,
+      setRoleDialogFormVisible: false,
       form: {
         username: '',
         password: '',
@@ -369,6 +403,42 @@ export default {
       // console.log(response);
       const { meta: { status, msg } } = response.data;
       if (status === 200) {
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
+      }
+    },
+    // 打开分配角色对话框
+    async handleOpenRoleDialog(user) {
+      // 打开对话框
+      this.setRoleDialogFormVisible = true;
+      // 显示当前用户名称
+      this.currentName = user.username;
+      this.currentUserId = user.id;
+      // 获取角色列表信息
+      const response = await this.$http.get('roles');
+      // console.log(response);
+      const { meta: { status, msg } } = response.data;
+      if (status === 200) {
+        this.roles = response.data.data;
+        // 根据id查询用户信息里有当前用户角色id
+        const userResponse = await this.$http.get(`users/${user.id}`);
+        this.currentRoleId = userResponse.data.data.rid;
+        // console.log(this.currentRoleId);
+      } else {
+        this.$message.error(msg);
+      }
+    },
+    // 分配角色
+    async handleRoleSet() {
+      this.setRoleDialogFormVisible = false;
+      const response = await this.$http.put(`users/${this.currentUserId}/role`, {
+        rid: this.currentRoleId
+      });
+      // console.log(response);
+      const { meta: { status, msg } } = response.data;
+      if (status === 200) {
+        this.currentRoleId = response.data.data.rid;
         this.$message.success(msg);
       } else {
         this.$message.error(msg);
