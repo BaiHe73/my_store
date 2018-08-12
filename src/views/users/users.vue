@@ -86,6 +86,7 @@
           </el-button>
           <!-- 删除按钮 -->
           <el-button
+            @click="handleDelete(scope.row.id)"
             type="danger"
             plain
             size="mini"
@@ -200,11 +201,11 @@ export default {
       rules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
+          { min: 3, max: 20, message: '长度在 3 到 20 个字符', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 3, max: 6, message: '长度在 3 到 6 个字符', trigger: 'blur' }
+          { min: 3, max: 16, message: '长度在 3 到 16 个字符', trigger: 'blur' }
         ]
       }
     };
@@ -249,6 +250,7 @@ export default {
     handleSearch() {
       this.loadData();
     },
+    // 增加用户
     async handleAdd() {
       // 进行表单验证
       this.$refs.addForm.validate(async (valid) => {
@@ -278,7 +280,7 @@ export default {
         }
       });
     },
-    // 处理修改对话框直接显示当前用户信息的方法
+    // 打开修改对话框直显示当前用户信息的方法
     openEditDialog(user) {
       // 这个user(随意命名)哪来的？？？？？？
       // console.log(user);
@@ -290,12 +292,14 @@ export default {
       // 存储用户的id
       this.form.id = user.id;
     },
+    // 关闭对话框清空表单信息
     handleEditClose() {
       // 清空表单数据 对话框×之后添加用户框无内容
       for (var key in this.form) {
         this.form[key] = '';
       }
     },
+    // 编辑用户
     async handleEdit() {
       // 发送编辑用户请求
       const response = await this.$http.put(`users/${this.form.id}`, {
@@ -322,6 +326,41 @@ export default {
         // 提示失败信息
         this.$message.error(msg);
       }
+    },
+    // 删除用户
+    async handleDelete(id) {
+      this.$confirm('确认删除用户?', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          // console.log(id);
+          // 点击确定按钮
+          // console.log(this);
+          const response = await this.$http.delete(`users/${id}`);
+          var { meta: { status, msg } } = response.data;
+          // console.log(response);
+          if (status === 200) {
+            // 为啥是一
+            if (this.usersData.length === 1 && this.pagenum !== 1) {
+              this.pagenum--;
+            }
+            // 重新渲染页面
+            this.loadData();
+            // 提示删除信息
+            this.$message.success(msg);
+          } else {
+            this.$message.error(msg);
+          }
+        })
+        .catch(() => {
+          // 点击取消删除按钮
+          this.$message({
+            type: 'info',
+            message: '取消删除'
+          });
+        });
     }
   }
 };
