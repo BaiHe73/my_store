@@ -4,6 +4,7 @@ import Router from 'vue-router';
 import Login from '@/views/login';
 import Home from '@/views/home';
 import Users from '@/views/users/users';
+import Rights from '@/views/rights/rights';
 // @ 代表的是src的绝对路径
 // @ 是在build/webpack.base.conf.js
 // 为什么可以省略.vue  在build/webpack.base.conf.js 中配置了
@@ -21,7 +22,8 @@ export default new Router({
       // 嵌套路由 当home的路由/匹配成功
       // /users会被渲染到home的router-view中
       children: [
-        { name: 'Users', path: '/users', component: Users }
+        { name: 'Users', path: '/users', component: Users },
+        { name: 'Rights', path: '/rights', component: Rights }
       ]
     }
   ]
