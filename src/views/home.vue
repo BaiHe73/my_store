@@ -18,10 +18,9 @@
              router 开启路由模式， menu-item的index作为路由地址,是否使用 vue-router 的模式，启用该模式会在激活导航时以 index 作为 path 进行路由跳转
          -->
         <el-menu
-          default-active="/users"
-          class="el-menu-vertical-demo"
           unique-opened
           router
+          style="height:100%"
           >
           <el-submenu index="1">
             <template slot="title">
