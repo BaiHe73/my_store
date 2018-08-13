@@ -1,5 +1,5 @@
 <template>
-  <el-card class="box-card">
+  <el-card class="card">
     <!-- 面包屑组件 -->
     <el-breadcrumb separator-class="el-icon-arrow-right">
       <el-breadcrumb-item>首页</el-breadcrumb-item>
@@ -449,9 +449,6 @@ export default {
 </script>
 
 <style>
-  .box-card {
-    height: 100%;
-  }
   .searchRow {
     margin-top: 10px;
   }
