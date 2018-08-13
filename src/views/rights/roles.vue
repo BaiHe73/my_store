@@ -93,6 +93,7 @@
             icon="el-icon-delete">
           </el-button>
           <el-button
+            @click="handleSetRights(scope.row)"
             type="warning"
             plain
             size="mini"
@@ -101,6 +102,25 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-dialog
+      title="分配权限"
+      :visible.sync="setRightsDialogVisible">
+      <!-- node-key="id" -->
+      <!-- ref="tree" -->
+      <!-- highlight-current -->
+      <el-tree
+        :data="rightsData"
+        show-checkbox
+        default-expand-all
+        node-key="id"
+        :default-checked-keys="checkedList"
+        :props="defaultProps">
+      </el-tree>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="setRightsDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="setRightsDialogVisible = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -108,7 +128,16 @@
 export default {
   data() {
     return {
-      rolesData: []
+      rolesData: [],
+      setRightsDialogVisible: false,
+      rightsData: [],
+      checkedList: [],
+      defaultProps: {
+        // 指定子树为节点对象的某个属性值
+        children: 'children',
+        // 设置树节点上展示的属性
+        label: 'authName'
+      }
     };
   },
   created() {
@@ -126,6 +155,7 @@ export default {
         this.$message.error(msg);
       }
     },
+    // 删除用户权限
     async handleClose(role, rightsId) {
       const response = await this.$http.delete(`roles/${role.id}/rights/${rightsId}`);
       const { meta: { status, msg } } = response.data;
@@ -140,6 +170,31 @@ export default {
         this.$message.error(msg);
       }
       // this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
+    },
+    // 展示分配权限列表
+    async handleSetRights(rights) {
+      this.checkedList = [];
+      this.setRightsDialogVisible = true;
+      const response = await this.$http.get('rights/tree');
+      // console.log(response);
+      const { meta: { status, msg } } = response.data;
+      if (status === 200) {
+        this.rightsData = response.data.data;
+        // 把当前角色所拥有的权限id，存储到checkedList
+        rights.children.forEach((level1) => {
+          // console.log(level1);
+          level1.children.forEach((level2) => {
+            // console.log(level2);
+            level2.children.forEach((level3) => {
+              // console.log(level3);
+              this.checkedList.push(level3.id);
+            });
+          });
+        });
+        // console.log(this.checkedList);
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
