@@ -56,7 +56,7 @@ export default {
       const { meta: { status, msg } } = response.data;
       if (status === 200) {
         this.rightsData = response.data.data;
-        this.$message.success(msg);
+        // this.$message.success(msg);
       } else {
         this.$message.error(msg);
       }

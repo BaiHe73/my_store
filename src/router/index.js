@@ -6,6 +6,8 @@ import Home from '@/views/home';
 import Users from '@/views/users/users';
 import Rights from '@/views/rights/rights';
 import Roles from '@/views/rights/roles';
+// 导入message
+import { Message } from 'element-ui';
 // @ 代表的是src的绝对路径
 // @ 是在build/webpack.base.conf.js
 // 为什么可以省略.vue  在build/webpack.base.conf.js 中配置了
@@ -46,7 +48,7 @@ router.beforeEach((to, from, next) => {
     // console.log(token);
     if (!token) {
       // console.log(this);
-      // this.app.$message.warning('请先登录');
+      Message.warning('请先登录');
       // 没有token，跳转到登录页面
       router.push('/login');
       return;
