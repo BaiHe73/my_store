@@ -14,30 +14,36 @@
       style="width: 100%; margin-top:10px">
       <el-table-column type="expand">
         <template slot-scope="scope">
+          <!-- 显示一级权限的名称 -->
           <el-row
             class="level1"
             v-for="level1 in scope.row.children"
             :key="level1.id">
             <el-col :span="4">
               <el-tag
+                @close="handleClose(scope.row,level1.id)"
                 closable>
                 {{level1.authName}}
               </el-tag>
             </el-col>
             <el-col :span="20">
+              <!-- 显示二级权限的名称 -->
               <el-row
                 class="level2"
                 v-for="level2 in level1.children"
                 :key="level2.id">
                 <el-col :span="4">
                   <el-tag
+                    @close="handleClose(scope.row,level2.id)"
                     closable
                     type="success">
                     {{level2.authName}}
                   </el-tag>
                 </el-col>
                 <el-col :span="20">
+                  <!-- 显示三级权限的名称 -->
                   <el-tag
+                    @close="handleClose(scope.row,level3.id)"
                     class="level3"
                     v-for="level3 in level2.children"
                     :key="level3.id"
@@ -111,7 +117,7 @@ export default {
   methods: {
     async loadData() {
       const response = await this.$http.get('roles');
-      console.log(response);
+      // console.log(response);
       const { meta: { status, msg } } = response.data;
       if (status === 200) {
         this.rolesData = response.data.data;
@@ -119,6 +125,21 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    async handleClose(role, rightsId) {
+      const response = await this.$http.delete(`roles/${role.id}/rights/${rightsId}`);
+      const { meta: { status, msg } } = response.data;
+      // console.log(response);
+      if (status === 200) {
+        // this.loadData();
+        // 重新加载当前角色所对应的权限列表?????
+        // 重新加载页面会关闭下拉框 这样处理可以直观显示关闭了哪项
+        role.children = response.data.data;
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
+      }
+      // this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
     }
   }
 };
