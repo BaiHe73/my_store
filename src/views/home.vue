@@ -22,7 +22,23 @@
           router
           style="height:100%"
           >
-          <el-submenu index="1">
+          <el-submenu
+            v-for="level1 in menusList"
+            :key="level1.id"
+            :index="level1.id.toString()">
+            <template slot="title">
+              <i class="el-icon-location"></i>
+              <span>{{ level1.authName }}</span>
+            </template>
+            <el-menu-item
+              v-for="level2 in level1.children"
+              :key="level2.id"
+              :index="'/' + level2.path">
+              <i class="el-icon-menu"></i>
+              {{ level2.authName }}
+            </el-menu-item>
+          </el-submenu>
+ <!--          <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-location"></i>
               <span>用户管理</span>
@@ -59,7 +75,7 @@
               <span>数据统计</span>
             </template>
               <el-menu-item index="5-1"><i class="el-icon-menu"></i>数据报表</el-menu-item>
-          </el-submenu>
+          </el-submenu> -->
         </el-menu>
       </el-aside>
       <el-main class="main">
@@ -72,9 +88,15 @@
 
 <script>
 export default {
+  data() {
+    return {
+      menusList: []
+    };
+  },
   // 判断是否登录
   // 在vue实例创建之前 检查是否具有token
   beforeCreate() {
+    // 在存储中获取到token
     var token = sessionStorage.getItem('token');
     // console.log(token);
     if (!token) {
@@ -82,6 +104,9 @@ export default {
       // 没有token，跳转到登录页面
       this.$router.push('/login');
     }
+  },
+  created() {
+    this.loadMenu();
   },
   methods: {
     // 退出处理函数
@@ -92,6 +117,17 @@ export default {
       sessionStorage.clear('token');
       // 跳转到登录页
       this.$router.push('/login');
+    },
+    async loadMenu() {
+      const response = await this.$http.get('menus');
+      // console.log(response);
+      const { meta: { status, msg } } = response.data;
+      if (status === 200) {
+        this.menusList = response.data.data;
+        console.log(this.menusList);
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
