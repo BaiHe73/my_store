@@ -52,7 +52,7 @@ export default {
     // 加载页面数据
     async loadData() {
       const response = await this.$http.get('rights/list');
-      console.log(response);
+      // console.log(response);
       const { meta: { status, msg } } = response.data;
       if (status === 200) {
         this.rightsData = response.data.data;

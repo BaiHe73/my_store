@@ -14,7 +14,7 @@ import Roles from '@/views/rights/roles';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   routes: [
     { name: 'Login', path: '/login', component: Login },
     { name: 'Home',
@@ -30,3 +30,31 @@ export default new Router({
     }
   ]
 });
+
+// 路由的全局前置守卫 （拦截器）  -- 路由跳转之前执行
+// 每个守卫方法接收三个参数：
+// to: Route: 即将要进入的目标 路由对象
+// from: Route: 当前导航正要离开的路由
+// next: Function: 一定要调用该方法来 resolve 这个钩子。执行效果依赖 next 方法的调用参数。
+router.beforeEach((to, from, next) => {
+  // console.log(to);
+  // console.log(from);
+  // 如果是登录的时候不判断token ，不是登录才判断token
+  if (to.name && to.name.toLocaleLowerCase() !== 'login') {
+    // 在存储中获取到token
+    var token = sessionStorage.getItem('token');
+    // console.log(token);
+    if (!token) {
+      // console.log(this);
+      // this.app.$message.warning('请先登录');
+      // 没有token，跳转到登录页面
+      router.push('/login');
+      return;
+    }
+  }
+  next();
+  // console.log(to);
+  // console.log(from);
+});
+
+export default router;

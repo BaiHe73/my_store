@@ -93,18 +93,6 @@ export default {
       menusList: []
     };
   },
-  // 判断是否登录
-  // 在vue实例创建之前 检查是否具有token
-  beforeCreate() {
-    // 在存储中获取到token
-    var token = sessionStorage.getItem('token');
-    // console.log(token);
-    if (!token) {
-      this.$message.warning('请先登录');
-      // 没有token，跳转到登录页面
-      this.$router.push('/login');
-    }
-  },
   created() {
     this.loadMenu();
   },
@@ -124,7 +112,7 @@ export default {
       const { meta: { status, msg } } = response.data;
       if (status === 200) {
         this.menusList = response.data.data;
-        console.log(this.menusList);
+        // console.log(this.menusList);
       } else {
         this.$message.error(msg);
       }
