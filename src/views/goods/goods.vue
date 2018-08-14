@@ -14,6 +14,7 @@
       </el-col>
       <el-col :span="16">
         <el-button
+          @click="$router.push('/goods/add')"
           class="btn"
           type="success"
           plain>
