@@ -51,6 +51,7 @@
         label="操作">
         <template slot-scope="scope">
           <el-button
+            @click="handleOpenEditCate(scope.row)"
             size="mini"
             type="primary"
             plain
@@ -77,7 +78,7 @@
       :total="total">
     </el-pagination>
     <!-- 添加分类对话框 -->
-    <el-dialog title="添加分类" :visible.sync="openCategoDialog">
+    <el-dialog title="添加分类" :visible.sync="openAddCateDialog">
       <el-form :model="form" label-width="100px">
         <el-form-item label="分类名称">
           <el-input v-model="form.cat_name" auto-complete="off"></el-input>
@@ -102,8 +103,19 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="openCategoDialog = false">取 消</el-button>
+        <el-button @click="openAddCateDialog = false">取 消</el-button>
         <el-button type="primary" @click="handleAddCate">确 定</el-button>
+      </div>
+    </el-dialog>
+    <el-dialog title="编辑分类" :visible.sync="openEditCateDialog">
+      <el-form label-width="100px">
+        <el-form-item label="分类名称">
+          <el-input v-model="catename" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="openEditCateDialog = false">取 消</el-button>
+        <el-button type="primary" @click="handleEditCate">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -128,7 +140,8 @@ export default {
       // 数据总条数
       total: 0,
       // 打开添加数据对话框
-      openCategoDialog: false,
+      openAddCateDialog: false,
+      openEditCateDialog: false,
       // 添加输入框中绑定的数据
       form: {},
       // 添加级联菜单中展示的绑定数据
@@ -144,6 +157,8 @@ export default {
         // 指定选项的子选项为选项对象的某个属性值
         children: 'children'
       },
+      catename: '',
+      cateId: -1,
       loading: true
     };
   },
@@ -175,7 +190,7 @@ export default {
       this.loadData();
     },
     async handleOpenAddDialog() {
-      this.openCategoDialog = true;
+      this.openAddCateDialog = true;
       const response = await this.$http.get('categories?type=2');
       this.options = response.data.data;
     },
@@ -203,7 +218,7 @@ export default {
         this.form.cat_pid = this.catId[1];
       }
       // console.log(this.form);
-      this.openCategoDialog = false;
+      this.openAddCateDialog = false;
       // 发送请求
       const response = await this.$http.post('categories', this.form);
       // console.log(response);
@@ -237,6 +252,28 @@ export default {
           message: '已取消删除'
         });
       });
+    },
+    async handleOpenEditCate(cate) {
+      this.openEditCateDialog = true;
+      const response = await this.$http.get(`categories/${cate.cat_id}`);
+      this.cateId = cate.cat_id;
+      this.catename = response.data.data.cat_name;
+      console.log(this.catename);
+    },
+    async handleEditCate(cate) {
+      this.openEditCateDialog = false;
+      const response = await this.$http.put(`categories/${this.cateId}`, {
+        cat_name: this.catename
+      });
+      // console.log(response);
+      const { meta: { status, msg } } = response.data;
+      if (status === 200) {
+        // this.rolesData = response.data.data;
+        this.loadData();
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
