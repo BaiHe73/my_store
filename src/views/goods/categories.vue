@@ -79,7 +79,7 @@
     <el-dialog title="收货地址" :visible.sync="openCategoDialog">
       <el-form :model="form" label-width="100px">
         <el-form-item label="分类名称">
-          <el-input v-model="form.name" auto-complete="off"></el-input>
+          <el-input v-model="form.cat_name" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="分类列表">
           <!--
@@ -96,14 +96,13 @@
             expand-trigger="hover"
             :options="options"
             :props="defaultProps"
-            v-model="catId"
-            @change="handleChange">
+            v-model="catId">
           </el-cascader>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="openCategoDialog = false">取 消</el-button>
-        <el-button type="primary" @click="openCategoDialog = false">确 定</el-button>
+        <el-button type="primary" @click="handleAddCate">确 定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -119,7 +118,6 @@ export default {
   },
   data() {
     return {
-      form: {},
       // 商品类别数据
       categoriesData: [],
       // 当前页码
@@ -130,9 +128,11 @@ export default {
       total: 0,
       // 打开添加数据对话框
       openCategoDialog: false,
+      // 添加输入框中绑定的数据
+      form: {},
       // 添加级联菜单中展示的绑定数据
       options: [],
-      // 添加中输入双向绑定的数据
+      // 添加中选择双向绑定的数据
       catId: [],
       // 显示数据源中的哪个属性的值
       defaultProps: {
@@ -178,9 +178,46 @@ export default {
       const response = await this.$http.get('categories?type=2');
       this.options = response.data.data;
     },
-    handleChange(value) {
-      console.log(value);
+    async handleAddCate() {
+      // console.log(this.catId);
+      // cat_level  级别
+      // 一级分类  0
+      // 二级分类  1
+      // 三级分类  2
+      // cat_pid  添加的分类的，父节点的id
+      // 父id   当是一级分类   0
+      // 父id   当是二级分类
+      // this.catIds 绑定的多级选择器的值，是一个数组
+      // this.catIds.length === 0  要添加的分类是一级分类
+      // this.catIds.length === 1  要添加的分类是二级分类
+      // this.catIds.length === 2  要添加的分类是三级分类
+      // 设置级别
+      this.form.cat_level = this.catId.length;
+      // 设置父id
+      if (this.catId.length === 0) {
+        this.form.cat_pid = 0;
+      } else if (this.catId.length === 1) {
+        this.form.cat_pid = this.catId[0];
+      } else if (this.catId.length === 2) {
+        this.form.cat_pid = this.catId[1];
+      }
+      // console.log(this.form);
+      this.openCategoDialog = false;
+      // 发送请求
+      const response = await this.$http.post('categories', this.form);
+      // console.log(response);
+      const { meta: { status, msg } } = response.data;
+      if (status === 201) {
+        // this.rolesData = response.data.data;
+        this.loadData();
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
+      }
     }
+    // handleChange(value) {
+    //   console.log(value);
+    // }
   }
 };
 </script>
