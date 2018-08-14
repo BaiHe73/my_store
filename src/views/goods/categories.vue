@@ -59,6 +59,16 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="pagenum"
+      :page-sizes="[6, 8, 10]"
+      :page-size="pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
 </template>
 
@@ -66,7 +76,15 @@
 export default {
   data() {
     return {
-      categoriesData: []
+      // 商品类别数据
+      categoriesData: [],
+      // 当前页码
+      pagenum: 1,
+      // 每页数据数目
+      pagesize: 6,
+      // 数据总条数
+      total: 0,
+      loading: true
     };
   },
   created() {
@@ -74,14 +92,27 @@ export default {
   },
   methods: {
     async loadData() {
-      const response = await this.$http.get('categories?type=3');
-      console.log(response);
+      this.loading = true;
+      const response = await this.$http.get(`categories?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
+      // console.log(response);
+      this.loading = false;
       const { meta: { status, msg } } = response.data;
       if (status === 200) {
-        this.categoriesData = response.data.data;
+        // 获取分类总数
+        this.total = response.data.data.total;
+        // 获取分类列表
+        this.categoriesData = response.data.data.result;
       } else {
         this.$message.error(msg);
       }
+    },
+    handleSizeChange(val) {
+      this.pagesize = val;
+      this.loadData();
+    },
+    handleCurrentChange(val) {
+      this.pagenum = val;
+      this.loadData();
     }
   }
 };
