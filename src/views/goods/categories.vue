@@ -157,8 +157,12 @@ export default {
         // 指定选项的子选项为选项对象的某个属性值
         children: 'children'
       },
+      // 双向绑定编辑分类输入框中的分类名称数据
       catename: '',
+      // 编辑分类时当前分类的id
       cateId: -1,
+      // 当前分类的数据对象
+      currenCate: null,
       loading: true
     };
   },
@@ -256,9 +260,13 @@ export default {
     async handleOpenEditCate(cate) {
       this.openEditCateDialog = true;
       const response = await this.$http.get(`categories/${cate.cat_id}`);
+      // 记录当前点击分类的id
       this.cateId = cate.cat_id;
+      // 根据当前id查询到分类名称
       this.catename = response.data.data.cat_name;
-      console.log(this.catename);
+      // console.log(this.catename);
+      // 存储当前分类的对象数据
+      this.currenCate = cate;
     },
     async handleEditCate(cate) {
       this.openEditCateDialog = false;
@@ -268,8 +276,8 @@ export default {
       // console.log(response);
       const { meta: { status, msg } } = response.data;
       if (status === 200) {
-        // this.rolesData = response.data.data;
-        this.loadData();
+        this.currenCate.cat_name = response.data.data.cat_name;
+        // this.loadData();
         this.$message.success(msg);
       } else {
         this.$message.error(msg);
