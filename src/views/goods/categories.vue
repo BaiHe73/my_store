@@ -19,11 +19,16 @@
       stripe
       :data="categoriesData"
       style="width: 100%">
-      <el-table-column
+      <el-table-tree-column
+        file-icon="icon icon-file"
+        folder-icon="icon icon-folder"
         prop="cat_name"
         label="分类名称"
-        width="380">
-      </el-table-column>
+        width="380"
+        treeKey="cat_id"
+        childKey="children"
+        parentKey="cat_pid"
+        levelKey="cat_level"></el-table-tree-column>
       <el-table-column
         label="级别"
         width="150">
@@ -59,7 +64,6 @@
         </template>
       </el-table-column>
     </el-table>
-
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -73,7 +77,13 @@
 </template>
 
 <script>
+// 引入element-tree-grid
+import ElementTreegrid from 'element-tree-grid';
 export default {
+  // 局部组件
+  components: {
+    'el-table-tree-column': ElementTreegrid
+  },
   data() {
     return {
       // 商品类别数据
