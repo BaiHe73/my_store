@@ -8,6 +8,7 @@
     </el-breadcrumb>
     <!-- 添加按钮 -->
     <el-button
+      @click="handleOpenAddDialog"
       class="btn"
       type="success"
       plain>
@@ -64,6 +65,7 @@
         </template>
       </el-table-column>
     </el-table>
+    <!-- 分页 -->
     <el-pagination
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
@@ -73,6 +75,37 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="total">
     </el-pagination>
+    <!-- 添加分类对话框 -->
+    <el-dialog title="收货地址" :visible.sync="openCategoDialog">
+      <el-form :model="form" label-width="100px">
+        <el-form-item label="分类名称">
+          <el-input v-model="form.name" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="分类列表">
+          <!--
+            expand-trigger="hover"  鼠标悬停的时候触发
+            options 绑定的数据(展示)
+            v-model 双向绑定(输入)
+            change-on-select  运行用户选择任意一级选项
+            props 设置下拉框中显示数据源中的哪个属性的值
+           -->
+          <el-cascader
+            placeholder="默认添加一级分类"
+            clearable
+            change-on-select
+            expand-trigger="hover"
+            :options="options"
+            :props="defaultProps"
+            v-model="catId"
+            @change="handleChange">
+          </el-cascader>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="openCategoDialog = false">取 消</el-button>
+        <el-button type="primary" @click="openCategoDialog = false">确 定</el-button>
+      </div>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -86,6 +119,7 @@ export default {
   },
   data() {
     return {
+      form: {},
       // 商品类别数据
       categoriesData: [],
       // 当前页码
@@ -94,6 +128,21 @@ export default {
       pagesize: 6,
       // 数据总条数
       total: 0,
+      // 打开添加数据对话框
+      openCategoDialog: false,
+      // 添加级联菜单中展示的绑定数据
+      options: [],
+      // 添加中输入双向绑定的数据
+      catId: [],
+      // 显示数据源中的哪个属性的值
+      defaultProps: {
+        // 指定选项的值为选项对象的某个属性值
+        value: 'cat_id',
+        // 指定选项的名称为选项对象的某个属性值
+        label: 'cat_name',
+        // 指定选项的子选项为选项对象的某个属性值
+        children: 'children'
+      },
       loading: true
     };
   },
@@ -123,6 +172,14 @@ export default {
     handleCurrentChange(val) {
       this.pagenum = val;
       this.loadData();
+    },
+    async handleOpenAddDialog() {
+      this.openCategoDialog = true;
+      const response = await this.$http.get('categories?type=2');
+      this.options = response.data.data;
+    },
+    handleChange(value) {
+      console.log(value);
     }
   }
 };
