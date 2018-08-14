@@ -57,6 +57,7 @@
             icon="el-icon-edit">
           </el-button>
           <el-button
+            @click="handleDeleteCate(scope.row)"
             size="mini"
             type="danger"
             plain
@@ -76,7 +77,7 @@
       :total="total">
     </el-pagination>
     <!-- 添加分类对话框 -->
-    <el-dialog title="收货地址" :visible.sync="openCategoDialog">
+    <el-dialog title="添加分类" :visible.sync="openCategoDialog">
       <el-form :model="form" label-width="100px">
         <el-form-item label="分类名称">
           <el-input v-model="form.cat_name" auto-complete="off"></el-input>
@@ -214,10 +215,29 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    handleDeleteCate(cate) {
+      this.$confirm('是否删除该分类?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const response = await this.$http.delete(`categories/${cate.cat_id}`);
+        console.log(response);
+        const { meta: { status, msg } } = response.data;
+        if (status === 200) {
+          this.loadData();
+          this.$message.success(msg);
+        } else {
+          this.$message.error(msg);
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     }
-    // handleChange(value) {
-    //   console.log(value);
-    // }
   }
 };
 </script>

@@ -255,7 +255,7 @@ export default {
       // 在发送请求时 要在请求头中添加Authorization=token 携带token
       var token = sessionStorage.getItem('token');
       this.$http.defaults.headers.common['Authorization'] = token;
-
+      // query:查询参数
       var response = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchValue}`);
       // console.log(response);
       // response 的样子
