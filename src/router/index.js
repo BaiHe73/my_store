@@ -9,6 +9,7 @@ import Roles from '@/views/rights/roles';
 import Categories from '@/views/goods/categories';
 import Goods from '@/views/goods/goods';
 import GoodAdd from '@/views/goods/goodAdd';
+import Params from '@/views/goods/params';
 // 导入message
 import { Message } from 'element-ui';
 // @ 代表的是src的绝对路径
@@ -33,7 +34,8 @@ const router = new Router({
         { name: 'Roles', path: '/roles', component: Roles },
         { name: 'Categories', path: '/categories', component: Categories },
         { name: 'Goods', path: '/goods', component: Goods },
-        { name: 'GoodAdd', path: '/goods/add', component: GoodAdd }
+        { name: 'GoodAdd', path: '/goods/add', component: GoodAdd },
+        { name: 'Params', path: '/params', component: Params }
       ]
     }
   ]
