@@ -125,4 +125,8 @@ export default {
     margin-top: 10px;
     margin-bottom: 10px;
   }
+  .btn {
+    margin: 0;
+    margin-left: 10px;
+  }
 </style>
